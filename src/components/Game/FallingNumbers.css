@@ -1,0 +1,205 @@
+.falling-numbers-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  background-color: black;
+  color: #ddd;
+  font-family: monospace;
+  overflow: hidden; /* Important to prevent scrollbars */
+}
+
+.numbers-container {
+  position: relative;
+  width: 80vw;
+  height: 60vh;
+  border: 1px solid #333; /* Subtle border */
+  overflow: hidden; /* Important to clip numbers */
+}
+
+/*стили для `number`*/
+.number {
+  position: absolute;
+  font-size: 1em; /* Smaller numbers */
+  color: #888;
+  transition: all 1s ease-in; /* плавное падение */
+  box-sizing: border-box; /* Add this to include padding and border in the element's total width and height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Add a subtle border */
+  z-index: 1;
+
+}
+
+/*а вот тут задаем стили для анимации падения*/
+.number.falling {
+  top: 100%; 
+  transform: translateY(-100%);
+  z-index: 100;
+}
+
+.number.highlighted {
+  font-size: 2em; /* Larger highlighted numbers */
+  color: #fff; /* Brighter color */
+  z-index: 10; /* Ensure highlighted numbers are on top */
+}
+
+
+.boxes-container {
+  display: flex;
+  justify-content: space-around;
+  width: 80vw;
+  margin-top: 20px;
+}
+
+.box {
+  width: 20%;
+  background-color: #222;
+  border: 1px solid #444;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.box-name {
+  font-size: 1em;
+  margin-bottom: 5px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #111;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: #007bff; /* Example color */
+  width: 0; /* Will be updated dynamically */
+  transition: width 0.3s ease;
+}
+
+.box-info {
+  font-size: 0.8em;
+  margin-top: 5px;
+}
+
+.score {
+  margin-top: 20px;
+  font-size: 1.2em;
+}
+
+.controls {
+  margin-top: 20px;
+}
+
+.controls button {
+  margin: 0 10px;
+  padding: 8px 15px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.message {
+  margin-top: 20px;
+  font-style: italic;
+  color: #666;
+}
+
+/* Мобильная адаптация (до 768px) */
+@media (max-width: 768px) {
+  .falling-numbers-container {
+    height: auto;
+    min-height: 100vh;
+    padding: 10px;
+    justify-content: flex-start;
+  }
+
+  .numbers-container {
+    width: 95vw;
+    height: 70vh;
+    margin: 10px 0;
+  }
+
+  .number {
+    font-size: 1.2em;
+    border-width: 0.5px;
+  }
+
+  .number.highlighted {
+    font-size: 1.5em;
+  }
+
+  .boxes-container {
+    flex-direction: column;
+    width: 95vw;
+    gap: 10px;
+  }
+
+  .box {
+    width: 95%;
+    padding: 8px;
+  }
+
+  .progress-bar {
+    height: 8px;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .controls button {
+    width: 100%;
+    margin: 5px 0;
+    padding: 10px;
+  }
+
+  .score {
+    font-size: 1em;
+    margin: 15px 0;
+  }
+
+  .message {
+    font-size: 0.9em;
+    margin: 15px 10px;
+    text-align: center;
+  }
+}
+
+/* Для очень маленьких экранов (до 480px) */
+@media (max-width: 480px) {
+  .numbers-container {
+    height: 60vh;
+  }
+
+  .number {
+    font-size: 1.2em;
+  }
+
+  .number.highlighted {
+    font-size: 1.5em;
+  }
+
+  .box-name {
+    font-size: 0.9em;
+  }
+
+  .box-info {
+    font-size: 0.7em;
+  }
+
+  .controls button {
+    padding: 8px;
+    font-size: 0.9em;
+  }
+}
