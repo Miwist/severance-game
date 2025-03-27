@@ -26,7 +26,9 @@ function FallingNumbers() {
   const [boxes, setBoxes] = useState<BoxType[]>([
     { id: 1, name: "01", capacity: 100, filled: 0 },
     { id: 2, name: "02", capacity: 150, filled: 0 },
-    { id: 3, name: "Cold Harbor", capacity: 200, filled: 0 },
+    { id: 3, name: "03", capacity: 200, filled: 0 },
+    { id: 4, name: "04", capacity: 300, filled: 0 },
+    { id: 5, name: "05", capacity: 500, filled: 0 },
   ]);
   const [score, setScore] = useState(0);
   const animationFrameId = useRef<number | null>(null);
@@ -47,13 +49,17 @@ function FallingNumbers() {
   const cellHeight = 100 / gridSize; // Percentage height of each cell
 
   const handleMouseEnter = (id: number) => {
-    setHoveredNumber(id);
+    if (id) {
+      setHoveredNumber(id);
+      handleClick(id);
+    }
   };
 
   const handleMouseLeave = () => {
     setHoveredNumber(null);
   };
 
+  // Генерация всех чисел
   const getInitialNumbers = () => {
     const initialNumbers: NumberType[] = [];
     for (let row = 0; row < gridSize; row++) {
@@ -77,26 +83,84 @@ function FallingNumbers() {
 
   useEffect(() => {
     if (isRunning.current) {
+
+
       const highlightInterval = setInterval(() => {
         if (!isRunning.current) {
           clearInterval(highlightInterval);
           return;
         }
 
+        const availableNumbers = numbers.filter((number) => !number.falling);
         const newHighlightedNumbers: number[] = [];
-        const availableNumbers = numbers.filter((number) => !number.falling); //  Убираем already falling
+
+        // Появление 9 чисел
         if (availableNumbers.length >= 9) {
-          for (let i = 0; i < 9; i++) {
-            const randomIndex = Math.floor(
-              Math.random() * availableNumbers.length
-            );
-            newHighlightedNumbers.push(availableNumbers[randomIndex].id);
+          const cols = 20;
+          const rows = Math.ceil(availableNumbers.length / cols);
+
+          if (cols >= 3 && rows >= 3) {
+            const maxStartRow = rows - 3;
+            const maxStartCol = cols - 3;
+
+            const startRow = Math.floor(Math.random() * (maxStartRow + 1));
+            const startCol = Math.floor(Math.random() * (maxStartCol + 1));
+
+            for (let i = 0; i < 3; i++) {
+              for (let j = 0; j < 3; j++) {
+                const index = (startRow + i) * cols + (startCol + j);
+                if (availableNumbers[index]) {
+                  newHighlightedNumbers.push(availableNumbers[index].id);
+                }
+              }
+            }
+
+            setHighlightedNumbers(newHighlightedNumbers);
           }
         }
-        setHighlightedNumbers(newHighlightedNumbers);
       }, 3000);
 
+      // Интервал для добавления новых чисел (каждые 3 секунды)
+      // const replenishInterval = setInterval(() => {
+      //   if (!isRunning.current) return;
+
+      //   // В интервале replenishInterval:
+      //   setNumbers((prevNumbers: any) => {
+      //     const currentNumbers = prevNumbers.filter((n: any) => !n.falling);
+      //     const cols = 20;
+      //     const rows = 10;
+      //     const grid = Array(cols * rows).fill(null);
+
+      //     // Заполняем сетку существующими числами
+      //     currentNumbers.forEach((num: any) => {
+      //       const col = Math.floor(num.x / (100 / cols));
+      //       const row = Math.floor(num.y / (100 / rows));
+      //       grid[row * cols + col] = num;
+      //     });
+
+      //     // Добавляем числа в пустые ячейки
+      //     const newNumbers = grid.reduce((acc, cell, index) => {
+      //       if (!cell && Math.random() > 0.8) {
+      //         // 70% шанс заполнить пустую ячейку
+      //         const row = Math.floor(index / cols);
+      //         const col = index % cols;
+      //         acc.push({
+      //           id: Date.now() + Math.random(),
+      //           value: Math.floor(Math.random() * 9) + 1,
+      //           x: col * (100 / cols),
+      //           y: row * (100 / rows),
+      //           falling: false,
+      //         });
+      //       }
+      //       return acc;
+      //     }, []);
+
+      //     return [...currentNumbers, ...newNumbers];
+      //   });
+      // }, 3500);
+
       return () => clearInterval(highlightInterval);
+        // clearInterval(replenishInterval);
     }
   }, [numbers]);
 
@@ -162,15 +226,16 @@ function FallingNumbers() {
 
   const startGame = () => {
     isRunning.current = true;
-    // animationFrameId.current = requestAnimationFrame(updateFallingNumbers);
     setStartGameInfo(true);
   };
 
   return (
     <div className="falling-numbers-container">
       <h1>Обработка Данных Lumon</h1>
-      <h3>{`${startGameInfo ? "Обрабатывайте" : "Пауза"}`}</h3>
-
+              <button onClick={toggleSound}>
+          {isSoundOn ? "🔊 Выкл звук" : "🔇 Вкл звук"}
+        </button>
+      <p className="message">{`${startGameInfo ? "Пожалуйста, продолжайте сортировку. Ваша производительность важна." : "Передохните"}`}</p>
       <div className="numbers-container" ref={containerRef}>
         {numbers.map((number) => (
           <div
@@ -185,7 +250,7 @@ function FallingNumbers() {
               height: `${cellHeight}%`,
               cursor: highlightedNumbers.includes(number.id)
                 ? "pointer"
-                : "default", // change курсор
+                : "default",
             }}
             onClick={() => handleClick(number.id)}
             onMouseEnter={() => handleMouseEnter(number.id)}
@@ -217,14 +282,10 @@ function FallingNumbers() {
       <div className="controls">
         <button onClick={stopGame}>Остановить</button>
         <button onClick={startGame}>Запустить</button>
-        <button onClick={toggleSound}>
-          {isSoundOn ? "🔊 Выкл звук" : "🔇 Вкл звук"}
-        </button>
+
       </div>
 
-      <p className="message">
-        Пожалуйста, продолжайте сортировку. Ваша производительность важна.
-      </p>
+
     </div>
   );
 }
